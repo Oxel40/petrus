@@ -1,0 +1,171 @@
+<script>
+
+function readSingleFile(e) {
+  var file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var contents = e.target.result;
+    displayContents(contents);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function displayContents(contents) {
+  var element = document.getElementById('file-content');
+
+  const blob = new Blob([contents], { type: 'application/pdf' });
+  
+  element.src = URL.createObjectURL(blob);
+  document.getElementById('file-preview').hidden = false;
+}
+</script>
+
+<form id="upload-form" phx-submit="print" phx-change="show">
+  <section id="new-drop-container" phx-drop-target={@uploads.document.ref} style="border:1px solid black;height:100px;">
+    <%= live_file_input @uploads.document %>
+  </section>
+  <button type="submit">Upload</button>
+</form>
+
+<script>
+document.getElementById({@uploads.document.ref})
+	.addEventListener('change', readSingleFile, false);
+
+dropContainer = document.getElementById('new-drop-container');
+
+dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+	evt.preventDefault();
+};
+
+dropContainer.ondrop = function(evt) {
+	// pretty simple -- but not for IE :(
+	let element = document.getElementById('file-input');
+	element.files = evt.dataTransfer.files;
+
+	element.dispatchEvent(new Event("change"));
+	
+	evt.preventDefault();
+};
+</script>
+
+
+<%= for path <- @uploaded_files do %>
+  <a href={path}><%= Path.basename(path) %></a>
+  <iframe src={path} style="width: 100%; height: 60vh;"></iframe>
+<% end %>
+
+
+<div id="file-preview" hidden="">
+	<h3>Contents of the file:</h3>
+	<iframe id="file-content" style="width: 100%; height: 60vh;"></iframe>
+</div>
+
+<form phx-submit="print">
+<div id="drop-container" style="border:1px solid black;height:100px;">
+	<p>Drop Here</p>
+	<input type="file" id="file-input" accept=".pdf"/>
+</div>
+<label for="replicas">No. Replicas</label>
+<input type="number" value="1" name="replicas">
+<button type="submit">Print</button>
+</form>
+
+<!---
+<style>
+
+div#file-preview {
+  height: 10em;
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
+div#file-preview p {
+  margin: 0
+}
+
+<style/>
+-->
+
+
+<script>
+
+function readSingleFile(e) {
+  var file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var contents = e.target.result;
+    displayContents(contents);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function displayContents(contents) {
+  var element = document.getElementById('file-content');
+
+  const blob = new Blob([contents], { type: 'application/pdf' });
+  
+  element.src = URL.createObjectURL(blob);
+  document.getElementById('file-preview').hidden = false;
+}
+
+document.getElementById('file-input')
+	.addEventListener('change', readSingleFile, false);
+
+
+dropContainer = document.getElementById('drop-container');
+
+dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+	evt.preventDefault();
+};
+
+dropContainer.ondrop = function(evt) {
+	// pretty simple -- but not for IE :(
+	let element = document.getElementById('file-input');
+	element.files = evt.dataTransfer.files;
+
+	element.dispatchEvent(new Event("change"));
+	
+	evt.preventDefault();
+};
+</script>
+
+<%# lib/my_app_web/live/upload_live.html.heex %>
+
+<%# use phx-drop-target with the upload ref to enable file drag and drop %>
+<section style="border:1px solid black;height:100px;" phx-drop-target={@uploads.avatar.ref}>
+
+<%# render each avatar entry %>
+<%= for entry <- @uploads.avatar.entries do %>
+  <article class="upload-entry">
+
+    <figure>
+      <.live_img_preview entry={entry} />
+      <figcaption><%= entry.client_name %></figcaption>
+    </figure>
+
+    <%# entry.progress will update automatically for in-flight entries %>
+    <progress value={entry.progress} max="100"> <%= entry.progress %>% </progress>
+
+    <%# a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 %>
+    <button type="button" phx-click="cancel-upload" phx-value-ref={entry.ref} aria-label="cancel">&times;</button>
+
+    <%# Phoenix.Component.upload_errors/2 returns a list of error atoms %>
+    <%= for _ <- upload_errors(@uploads.avatar, entry) do %>
+      <p class="alert alert-danger">An error</p>
+    <% end %>
+
+  </article>
+<% end %>
+
+<%# Phoenix.Component.upload_errors/1 returns a list of error atoms %>
+<%= for _ <- upload_errors(@uploads.avatar) do %>
+  <p class="alert alert-danger">An error</p>
+<% end %>
+
+</section>

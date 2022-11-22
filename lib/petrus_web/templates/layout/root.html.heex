@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="csrf-token" content={csrf_token_value()}>
+    <%= live_title_tag assigns[:page_title] || "Petrus" %>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+	<link rel="stylesheet" href="//aurora.datasektionen.se" type="text/css" />
+    <%= if Mix.env() in [:dev, :test] do %>
+      <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
+    <% end %>
+  </head>
+  <body>
+    <div id="methone-container-replace">
+    </div>
+	<div id="application" class="cerise">
+	  <header>
+	    <div class="header-inner"> <div class="row"> <div class="header-left col-md-2"> </div> <div class="col-md-8">
+          <h2><%= assigns[:page_header] || "Header" %></h2>
+        </div> <div class="header-right col-md-2"> </div> </div> <div class="clear"></div> </div>
+      </header>
+      <script>
+        window.methone_conf = {
+        system_name: "petrus-web",
+        color_scheme: "cerise",
+        login_text: null,
+        login_href: "/login",
+        links: [
+          {
+          str: "Skriv Ut",
+          href: "/print",
+          },
+          {
+          str: "Skrivar Status",
+          href: "/status",
+          }
+        ]
+        }
+      </script>
+      <script async src="//methone.datasektionen.se/bar.js"></script>
+      <%= @inner_content %>
+	</div>
+  </body>
+</html>

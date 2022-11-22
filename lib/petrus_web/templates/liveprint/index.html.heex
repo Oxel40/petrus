@@ -1,0 +1,20 @@
+<.form let={f} for={:printopts} phx-change="validate" phx-submit="print">
+  <%= label f, :pdf_file %>
+  <div class="container" phx-drop-target={@uploads.document.ref} style="border:1px solid black;height:100px;">
+    <!-- ... -->
+    <!-- <.live_file_input upload={@uploads.document} /> -->
+    <%= live_file_input @uploads.document %>
+  </div>
+  <%= error_tag f, :pdf_file %>
+
+  <%= label f, :pages %>
+  <%= text_input f, :pages , [placeholder: "E.g. 1-3 or 2,3,5-8"] %>
+  <%= error_tag f, :pages %>
+
+  <%= label f, :doublesided %>
+  <%= checkbox f, :doublesided %>
+  <%= error_tag f, :doublesided %>
+
+  <br>
+  <%= submit "Print" %>
+</.form>
