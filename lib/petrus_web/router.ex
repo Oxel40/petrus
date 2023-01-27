@@ -25,6 +25,8 @@ defmodule PetrusWeb.Router do
     delete "/status", PrinterController, :clear_print_queue
 
     get "/fuzzyfile", FuzzyController, :fuzzyfile
+
+    live "/liveprint", LiveprintLive
   end
 
   # Other scopes may use custom stacks.

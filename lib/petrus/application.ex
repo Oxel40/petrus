@@ -13,9 +13,12 @@ defmodule Petrus.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Petrus.PubSub},
       # Start the Endpoint (http/https)
-      PetrusWeb.Endpoint
+      PetrusWeb.Endpoint,
       # Start a worker by calling: Petrus.Worker.start_link(arg)
       # {Petrus.Worker, arg}
+      # Registry
+      # {Registry, keys: :unique, name: Petrus.Registry}
+      Petrus.PrinterBroker
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

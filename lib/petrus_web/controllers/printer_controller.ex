@@ -1,5 +1,6 @@
 defmodule PetrusWeb.PrinterController do
   use PetrusWeb, :controller
+  alias Petrus.PrinterBroker, as: PB
 
   defp render_print(conn) do
     conn
@@ -8,6 +9,7 @@ defmodule PetrusWeb.PrinterController do
   end
 
   defp render_status(conn) do
+    IO.inspect(PB.print_binary(<<>>))
     conn
     |> assign(:page_header, "Skrivar Status")
     |> render("status.html")
