@@ -9,24 +9,49 @@ defmodule PetrusWeb.PrinterController do
   end
 
   defp render_status(conn) do
-    IO.inspect(PB.print_binary(<<>>))
+    {_, printer_log} = PB.agent_status()
+
     conn
+    |> assign(:printer_log, printer_log)
     |> assign(:page_header, "Skrivar Status")
     |> render("status.html")
   end
 
-  def show(conn, _params) do
+  def print(conn, _params) do
+    # ... skrivare inte tillgänglig
     render_print(conn)
   end
 
-  def post(conn, %{"print_form" => %{"file" => %Plug.Upload{:content_type => "application/pdf",
-                                                            :path => path,
-                                                            :filename => filename}}})
-  do
-    {_, 0} = System.cmd("lp", [path])
+  def status(conn, _params) do
+    # {printer_log, 0} = System.cmd("lpstat", ["-t"])
+    {_, printer_log} = PB.agent_status()
+
     conn
-    |> put_flash(:info, filename <> " sent for printing")
+    |> assign(:printer_log, printer_log)
+    |> render_status()
+  end
+
+  def post(conn, %{
+        "print_form" => %{
+          "file" => %Plug.Upload{
+            :content_type => "application/pdf",
+            :path => path,
+            :filename => filename
+          }
+        }
+      }) do
+    {code, msg} = PB.print_binary(File.read!(path))
+
+    case code do
+      :error -> put_flash(conn, :error, msg)
+      _ -> put_flash(conn, :info, filename <> " sent for printing")
+    end
     |> render_print()
+
+    # {_, 0} = System.cmd("lp", [path])
+    # conn
+    # |> put_flash(:info, filename <> " sent for printing")
+    # |> render_print()
   end
 
   def post(conn, _params) do
@@ -35,18 +60,10 @@ defmodule PetrusWeb.PrinterController do
     |> render_print()
   end
 
-  def status(conn, _params) do
-    {printer_log, 0} = System.cmd("lpstat", ["-t"])
-    conn
-    |> assign(:printer_log, printer_log)
-    |> render_status()
-  end
-
   def clear_print_queue(conn, _params) do
-    {_, 0} = System.cmd("cancel", ["-a"])
-    {printer_log, 0} = System.cmd("lpstat", ["-t"])
+    PB.clear_queue()
+
     conn
-    |> assign(:printer_log, printer_log)
     |> put_flash(:info, "Skrivarkön ränsad")
     |> render_status()
   end

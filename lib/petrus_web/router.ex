@@ -17,8 +17,8 @@ defmodule PetrusWeb.Router do
   scope "/", PetrusWeb do
     pipe_through :browser
 
-    get  "/",      PrinterController, :show
-    get  "/print", PrinterController, :show
+    get  "/",      PrinterController, :print
+    get  "/print", PrinterController, :print
     post "/print", PrinterController, :post
 
     get    "/status", PrinterController, :status
