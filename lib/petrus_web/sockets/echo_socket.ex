@@ -31,7 +31,7 @@ defmodule PetrusWeb.EchoSocket do
   end
 
   def handle_in({text, _opts}, state) do
-    Logger.info("receved status report:\n" <> text)
+    Logger.info("receved status report")
     PB.set_agent_status(text)
     {:ok, state}
   end
