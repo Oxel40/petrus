@@ -1,6 +1,31 @@
 defmodule Petrus.PrinterBroker do
   use GenServer
 
+  def printer_down_ascii() do
+    """
+                  ,---------------------------,
+                  |  /---------------------\  |
+                  | |                       | |
+                  | |          X~X          | |
+                  | |                       | |
+                  | |    Service Needed     | |
+                  | |                       | |
+                  |  \_____________________/  |
+                  |___________________________|
+                ,---\_____     []     _______/------,
+              /         /______________\           /|
+            /___________________________________ /  | ___
+            |                                   |   |    )
+            |  _ _ _                 [-------]  |   |   (
+            |  o o o                 [-------]  |  /    _)_
+            |__________________________________ |/     /  /
+        /-------------------------------------/|      ( )/
+      /-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/ /
+    /-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/ /
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    """
+  end
+
   ## Server "backend"
 
   @impl true
@@ -31,7 +56,7 @@ defmodule Petrus.PrinterBroker do
     if active_agent?(state) do
       {:reply, {:ok, state[:agent_status]}, state}
     else
-      {:reply, {:error, "no agent avalibe"}, state}
+      {:reply, {:error, printer_down_ascii()}, state}
     end
   end
 

@@ -3,27 +3,35 @@ defmodule PetrusWeb.PrinterController do
   alias Petrus.PrinterBroker, as: PB
 
   defp render_print(conn) do
-    conn
+    {code, _} = PB.agent_status()
+
+    if code == :error do 
+      put_flash(conn, :error, "Ingen skrivare tillgänglig")
+    else
+      conn
+    end
     |> assign(:page_header, "Skriv Ut")
     |> render("index.html")
   end
 
   defp render_status(conn) do
-    {_, printer_log} = PB.agent_status()
+    {code, printer_log} = PB.agent_status()
 
-    conn
+    if code == :error do 
+      put_flash(conn, :error, "Ingen skrivare tillgänglig")
+    else
+      conn
+    end
     |> assign(:printer_log, printer_log)
     |> assign(:page_header, "Skrivar Status")
     |> render("status.html")
   end
 
   def print(conn, _params) do
-    # ... skrivare inte tillgänglig
     render_print(conn)
   end
 
   def status(conn, _params) do
-    # {printer_log, 0} = System.cmd("lpstat", ["-t"])
     {_, printer_log} = PB.agent_status()
 
     conn
@@ -44,19 +52,14 @@ defmodule PetrusWeb.PrinterController do
 
     case code do
       :error -> put_flash(conn, :error, msg)
-      _ -> put_flash(conn, :info, filename <> " sent for printing")
+      _ -> put_flash(conn, :info, filename <> " skickad för utskrift")
     end
     |> render_print()
-
-    # {_, 0} = System.cmd("lp", [path])
-    # conn
-    # |> put_flash(:info, filename <> " sent for printing")
-    # |> render_print()
   end
 
   def post(conn, _params) do
     conn
-    |> put_flash(:error, "Invalid print request")
+    |> put_flash(:error, "Felaktig utskrifts begäran (Invalid request)")
     |> render_print()
   end
 
