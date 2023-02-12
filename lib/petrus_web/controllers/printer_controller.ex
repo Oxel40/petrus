@@ -52,7 +52,7 @@ defmodule PetrusWeb.PrinterController do
 
     case code do
       :error -> put_flash(conn, :error, msg)
-      _ -> put_flash(conn, :info, filename <> " skickad för utskrift")
+      _ -> put_flash(conn, :info, "\"#{filename}\" skickad för utskrift")
     end
     |> render_print()
   end
