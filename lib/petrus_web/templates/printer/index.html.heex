@@ -36,28 +36,28 @@ function isMobile() {
 }
 
 function readFileIfDesktop(e) {
+  var file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+  console.log(file);
+  updateLabel(file.name);
   // Only show the PDF in a iframe if we are on a desktop.
   // Moblie browsers tend to download the file instead of displaying it.
   if (!isMobile()) {
-    readSingleFile(e);
+    readSingleFile(file);
   } else {
     console.log("mobile device detected, won't display PDF iframe");
   }
 }
 
-function readSingleFile(e) {
-  var file = e.target.files[0];
-  if (!file) {
-    return;
-  }
+function readSingleFile(file) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var contents = e.target.result;
     displayContents(contents);
   };
   reader.readAsArrayBuffer(file);
-  console.log(file);
-  updateLabel(file.name);
 }
 
 function displayContents(contents) {
