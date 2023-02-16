@@ -12,7 +12,7 @@ defmodule PetrusWeb.Endpoint do
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
-  socket "/test", PetrusWeb.EchoSocket, websocket: [
+  socket "/printer-agent", PetrusWeb.PrinterSocket, websocket: [
     connect_info: [:x_headers]
   ]
 

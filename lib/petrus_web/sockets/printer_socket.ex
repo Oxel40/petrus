@@ -1,4 +1,4 @@
-defmodule PetrusWeb.EchoSocket do
+defmodule PetrusWeb.PrinterSocket do
   @behaviour Phoenix.Socket.Transport
   alias Petrus.PrinterBroker, as: PB
   require Logger
@@ -14,6 +14,7 @@ defmodule PetrusWeb.EchoSocket do
     case Enum.find(x_headers, fn {k, _v} -> k == "x-printer-auth" end) do
       {"x-printer-auth", auth_token} ->
         if secret() == auth_token do
+          Logger.info("connected")
           {:ok, state}
         else
           Logger.info("invalid secret")
