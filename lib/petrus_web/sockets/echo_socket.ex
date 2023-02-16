@@ -8,17 +8,26 @@ defmodule PetrusWeb.EchoSocket do
     %{id: __MODULE__, start: {Task, :start_link, [fn -> :ok end]}, restart: :transient}
   end
 
-  def connect(state) do
+  def connect(%{connect_info: %{x_headers: [{"x-printer-auth", auth_token}]}} = state) do
     # Callback to retrieve relevant data from the connection.
     # The map contains options, params, transport and endpoint keys.
-    # Logger.info("Websocket connected")
-    {:ok, state}
+    Logger.info("Printer agent trying to connect\nstate: #{inspect(state, pretty: true)}")
+
+    if secret() == auth_token do
+      {:ok, state}
+    else
+      :error
+    end
+  end
+
+  def connect(_state) do
+    # no header for authentication
+    :error
   end
 
   def init(state) do
     # Now we are effectively inside the process that maintains the socket.
     Logger.info("init")
-    Logger.info(inspect(state))
     res = PB.register_agent(self())
     Logger.info(inspect(res))
 
@@ -26,12 +35,10 @@ defmodule PetrusWeb.EchoSocket do
       {:ok, _} -> {:ok, state}
       {:error, {:already_registered, _}} -> {:error, state}
     end
-
-    # {:ok, state}
   end
 
   def handle_in({text, _opts}, state) do
-    Logger.info("receved status report")
+    # Logger.info("receved status report")
     PB.set_agent_status(text)
     {:ok, state}
   end
@@ -68,5 +75,9 @@ defmodule PetrusWeb.EchoSocket do
   def terminate(_reason, _state) do
     Logger.info("terminating")
     :ok
+  end
+
+  defp secret() do
+    Application.fetch_env!(:petrus, :agent_secret)
   end
 end
