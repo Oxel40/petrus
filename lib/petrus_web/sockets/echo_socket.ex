@@ -8,20 +8,27 @@ defmodule PetrusWeb.EchoSocket do
     %{id: __MODULE__, start: {Task, :start_link, [fn -> :ok end]}, restart: :transient}
   end
 
-  def connect(%{connect_info: %{x_headers: [{"x-printer-auth", auth_token}]}} = state) do
-    # Callback to retrieve relevant data from the connection.
-    # The map contains options, params, transport and endpoint keys.
-    Logger.info("Printer agent trying to connect\nstate: #{inspect(state, pretty: true)}")
+  def connect(%{connect_info: %{x_headers: x_headers}} = state) do
+    Logger.info("Printer agent trying to connect")
 
-    if secret() == auth_token do
-      {:ok, state}
-    else
-      :error
+    case Enum.find(x_headers, fn {k, _v} -> k == "x-printer-auth" end) do
+      {"x-printer-auth", auth_token} ->
+        if secret() == auth_token do
+          {:ok, state}
+        else
+          Logger.info("invalid secret")
+          :error
+        end
+
+      _ ->
+        Logger.info("x-printer-auth header not found")
+        :error
     end
   end
 
   def connect(_state) do
-    # no header for authentication
+    # no x-header for authentication
+    Logger.info("Printer agent trying to connect but without a x-header for auth")
     :error
   end
 
