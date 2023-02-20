@@ -67,7 +67,7 @@ defmodule PetrusWeb.PrinterController do
     PB.clear_queue()
 
     conn
-    |> put_flash(:info, "Skrivarkön ränsad")
+    |> put_flash(:info, "Skrivarkön rensad")
     |> render_status()
   end
 end

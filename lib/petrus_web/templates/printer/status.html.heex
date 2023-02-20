@@ -1,4 +1,4 @@
 <pre><code><%= @printer_log %></code></pre>
 <%= form_for :clear_form, Routes.printer_path(@conn, :clear_print_queue), [method: "delete"], fn _ -> %>
-  <%= submit "Ränsa Skrivarkö", [class: "button btn-color theme-color"] %>
+  <%= submit "Rensa Skrivarkö", [class: "button btn-color theme-color"] %>
 <% end %>
