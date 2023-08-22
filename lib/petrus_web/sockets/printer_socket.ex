@@ -13,6 +13,7 @@ defmodule PetrusWeb.PrinterSocket do
 
     case Enum.find(x_headers, fn {k, _v} -> k == "x-printer-auth" end) do
       {"x-printer-auth", auth_token} ->
+        Logger.info("x-printer-auth header found")
         if secret() == auth_token do
           Logger.info("connected")
           {:ok, state}

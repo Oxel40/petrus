@@ -6,7 +6,7 @@ kill_timeout = 5
 processes = []
 
 [env]
-  PHX_HOST = "flying-petrus.fly.dev"
+  PHX_HOST = "petrus.oxel.dev"
   PORT = "8080"
 
 [experimental]
@@ -20,8 +20,8 @@ processes = []
   protocol = "tcp"
   script_checks = []
   [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
+    hard_limit = 25000
+    soft_limit = 20000
     type = "connections"
 
   [[services.ports]]
