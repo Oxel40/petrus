@@ -32,3 +32,5 @@ erl_crash.dump
 npm-debug.log
 */assets/node_modules/
 
+# Secrets file for printer agent
+*/secrets
