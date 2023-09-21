@@ -9,16 +9,19 @@ defmodule PetrusWeb.AuthController do
   end
 
   def require_auth(conn, _params) do
-    if verified?(conn) do
-      Logger.alert("logged in")
+    if Mix.env() == :prod do
+      ### \/\/ TODO: Remove this after datasektionen.se is fixed \/\/ ###
+      Logger.alert("Ignoring authenctication")
       conn
+      ### /\/\ TODO: Remove this after datasektionen.se is fixed /\/\ ###
     else
-      Logger.alert("not logged in")
-      Logger.alert("callback: #{callback_url(conn)}")
-
-      conn
-      |> redirect(external: "#{login_authority()}/login?callback=#{callback_url(conn)}")
-      |> halt()
+      if verified?(conn) do
+        conn
+      else
+        conn
+        |> redirect(external: "#{login_authority()}/login?callback=#{callback_url(conn)}")
+        |> halt()
+      end
     end
   end
 
