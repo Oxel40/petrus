@@ -15,6 +15,11 @@ defmodule PetrusWeb.FuzzyController do
           name: "Skrivar Status",
           str: "skrivar status",
           href: "/status"
+        },
+        %{
+          name: "How to petrus",
+          str: "Hur man petrusar",
+          href: "/how2petrus"
         }
       ]
     }

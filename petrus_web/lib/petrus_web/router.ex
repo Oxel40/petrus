@@ -1,6 +1,8 @@
 defmodule PetrusWeb.Router do
   use PetrusWeb, :router
 
+  import PetrusWeb.AuthController
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -15,7 +17,7 @@ defmodule PetrusWeb.Router do
   end
 
   scope "/", PetrusWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_auth]
 
     get  "/",      PrinterController, :print
     get  "/print", PrinterController, :print
@@ -24,15 +26,17 @@ defmodule PetrusWeb.Router do
     get    "/status", PrinterController, :status
     delete "/status", PrinterController, :clear_print_queue
 
+    get "/how2petrus", DocController, :doc
+
     get "/fuzzyfile", FuzzyController, :fuzzyfile
+
 
     live "/liveprint", LiveprintLive
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", PetrusWeb do
-  #   pipe_through :api
-  # end
+  scope "/auth", PetrusWeb do
+    get "/callback/:token", AuthController, :callback
+  end
 
   # Enables LiveDashboard only for development
   #
