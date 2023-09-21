@@ -9,7 +9,7 @@ defmodule PetrusWeb.AuthController do
   end
 
   def require_auth(conn, _params) do
-    if Mix.env() == :prod do
+    if System.get_env("MIX_ENV") do
       ### \/\/ TODO: Remove this after datasektionen.se is fixed \/\/ ###
       Logger.alert("Ignoring authenctication")
       conn
