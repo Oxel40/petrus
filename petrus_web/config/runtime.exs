@@ -67,7 +67,6 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
 
-
 if config_env() == :prod do
   agent_secret =
     System.get_env("AGENT_SECRET") ||
@@ -75,9 +74,14 @@ if config_env() == :prod do
       environment variable AGENT_SECRET is missing.
       """
 
-  config :petrus, agent_secret: agent_secret
-else
-  agent_secret = System.get_env("AGENT_SECRET") || "testing"
+  login_authority = "https://login.datasektionen.se"
 
   config :petrus, agent_secret: agent_secret
+  config :petrus, login_authority: login_authority
+else
+  agent_secret = System.get_env("AGENT_SECRET") || "testing"
+  login_authority = "http://localhost:1337"
+
+  config :petrus, agent_secret: agent_secret
+  config :petrus, login_authority: login_authority
 end

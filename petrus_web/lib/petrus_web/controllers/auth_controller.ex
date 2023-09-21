@@ -4,7 +4,7 @@ defmodule PetrusWeb.AuthController do
 
   def callback(conn, %{"token" => token}) do
     conn
-    |> put_resp_cookie("petrus-auth-token", token, encrypt: true)
+    |> put_resp_cookie(token_cookie(), token, encrypt: true)
     |> redirect(to: "/")
   end
 
@@ -17,16 +17,19 @@ defmodule PetrusWeb.AuthController do
       Logger.alert("callback: #{callback_url(conn)}")
 
       conn
-      |> redirect(external: "#{login_domain()}/login?callback=#{callback_url(conn)}")
+      |> redirect(external: "#{login_authority()}/login?callback=#{callback_url(conn)}")
       |> halt()
     end
   end
 
   defp verified?(conn) do
-    conn = fetch_cookies(conn, encrypted: ~w(petrus-auth-token))
+    conn = fetch_cookies(conn, encrypted: token_cookie())
+    token_name = token_cookie()
+
     case conn.cookies do
-      %{"petrus-auth-token" => token} ->
+      %{^token_name => token} ->
         verify_token(token)
+
       _ ->
         false
     end
@@ -34,7 +37,7 @@ defmodule PetrusWeb.AuthController do
 
   defp verify_token(token) do
     {:ok, response} =
-      HTTPoison.get("#{login_domain()}/verify/#{token}.json?api_key=TODO")
+      HTTPoison.get("#{login_authority()}/verify/#{token}.json?api_key=TODO")
 
     case response do
       %{status_code: 200} ->
@@ -58,13 +61,14 @@ defmodule PetrusWeb.AuthController do
         [] -> conn.port
       end
 
-    # URI.encode("#{scheme}://#{conn.host}:#{port}#{conn.request_path}?#{conn.query_string}")
     URI.encode("#{scheme}://#{conn.host}:#{port}/auth/callback")
   end
 
-  defp login_domain() do
-    "http://localhost:1337"
-    # "https://login.datasektionen.se"
+  defp login_authority() do
+    Application.fetch_env!(:petrus, :login_authority)
   end
 
+  defp token_cookie() do
+    "petrus-auth-token"
+  end
 end
