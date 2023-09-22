@@ -75,13 +75,22 @@ if config_env() == :prod do
       """
 
   login_authority = "https://login.datasektionen.se"
+  login_api_key =
+    System.get_env("LOGIN_API_KEY") ||
+      raise """
+      environment variable LOGIN_API_KEY is missing.
+      """
 
   config :petrus, agent_secret: agent_secret
   config :petrus, login_authority: login_authority
+  config :petrus, login_api_key: login_api_key
 else
   agent_secret = System.get_env("AGENT_SECRET") || "testing"
   login_authority = "http://localhost:1337"
+  login_api_key =
+    System.get_env("LOGIN_API_KEY") || "testing"
 
   config :petrus, agent_secret: agent_secret
   config :petrus, login_authority: login_authority
+  config :petrus, login_api_key: login_api_key
 end

@@ -22,3 +22,4 @@ deployed application to work correctly (not needed if running debug locally):
 by `mix phx.gen.secret`
 - `AGENT_SECRET`: The printer agent secret, only known to this webserver and 
 the printer agent
+- `LOGIN_API_KEY`: The API key used to interface with `login.datasektionen.se`.

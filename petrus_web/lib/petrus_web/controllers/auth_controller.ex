@@ -9,19 +9,12 @@ defmodule PetrusWeb.AuthController do
   end
 
   def require_auth(conn, _params) do
-    if System.get_env("MIX_ENV") do
-      ### \/\/ TODO: Remove this after datasektionen.se is fixed \/\/ ###
-      Logger.alert("Ignoring authenctication")
+    if verified?(conn) do
       conn
-      ### /\/\ TODO: Remove this after datasektionen.se is fixed /\/\ ###
     else
-      if verified?(conn) do
-        conn
-      else
-        conn
-        |> redirect(external: "#{login_authority()}/login?callback=#{callback_url(conn)}")
-        |> halt()
-      end
+      conn
+      |> redirect(external: "#{login_authority()}/login?callback=#{callback_url(conn)}")
+      |> halt()
     end
   end
 
@@ -40,7 +33,7 @@ defmodule PetrusWeb.AuthController do
 
   defp verify_token(token) do
     {:ok, response} =
-      HTTPoison.get("#{login_authority()}/verify/#{token}.json?api_key=TODO")
+      HTTPoison.get("#{login_authority()}/verify/#{token}.json?api_key=#{login_api_key()}")
 
     case response do
       %{status_code: 200} ->
@@ -64,11 +57,15 @@ defmodule PetrusWeb.AuthController do
         [] -> conn.port
       end
 
-    URI.encode("#{scheme}://#{conn.host}:#{port}/auth/callback")
+    URI.encode("#{scheme}://#{conn.host}:#{port}/auth/callback/")
   end
 
   defp login_authority() do
     Application.fetch_env!(:petrus, :login_authority)
+  end
+
+  defp login_api_key() do
+    Application.fetch_env!(:petrus, :login_api_key)
   end
 
   defp token_cookie() do
